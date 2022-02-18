@@ -23,4 +23,9 @@ class QueryBuilder{
         $this->selectables=func_get_args();
         return $this;
     }
+
+    public function query($sql){
+        return $statement = $this->pdo->prepare($sql);
+    }
+
 }

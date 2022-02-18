@@ -1,18 +1,16 @@
 <?php
 
+    function  dd($args){
+        $var=func_get_args();
+        foreach($var as $arg){
+            echo '<pre>'.
+                var_dump($arg).
+                '</pre>';
+        } 
+        die;
+    }
 
-
-         function  dd($args){
-            $var=func_get_args();
-            foreach($var as $arg){
-                echo '<pre>'.
-                    var_dump($arg).
-                    '</pre>';
-            } 
-            die;
-        }
-
-            /**
+        /**
      * Require a view.
      *
      * @param  string $name

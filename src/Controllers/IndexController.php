@@ -9,7 +9,7 @@ class IndexController {
 
         public function index()
         {
-            $users = Registry::get('database')->selectAll('users');
+            $users = Registry::get('database')->selectAll('usuarios');
             
             return view('index', compact('users'));
         }
