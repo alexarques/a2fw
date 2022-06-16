@@ -1,5 +1,5 @@
 <?php
-    ini_set('display_errors', 'On');
+    ini_set('display_errors', 'Off');
     require __DIR__.'/vendor/autoload.php';
     require __DIR__ . '/bootstrap.php';
 

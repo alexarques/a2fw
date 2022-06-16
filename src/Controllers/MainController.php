@@ -17,6 +17,29 @@ class MainController extends Controller {
  
     }
     public function index(){
+
+        // $db = Registry::get('database');
+        // $sql_id = "SELECT id from usuarios WHERE username = '".$username."';"; //id de usr
+        // $stmt_id = $db->query($sql_id);
+        // $stmt_id->execute();
+        // $idArray = $stmt_id->fetchAll();
+
+        $db = Registry::get('database');
+        
+        //USER -> CURS
+        $sql_usrCurso = "SELECT id_curso from usuarios_cursos WHERE id_usuarios = '".$_SESSION["usrid"]."';";
+        $stmt_usrCurso= $db->query($sql_usrCurso);
+        $stmt_usrCurso->execute();
+        $usrCurso = $stmt_usrCurso->fetchAll();
+        // $_SESSION["usrCurso"] = $usrCurso;
+
+        //USER -> CURS_NAME
+        $sql_shUsrCurso = "SELECT curs_name from cursos WHERE id = '".$usrCurso[0]."';";
+        $stmt_shUsrCurso= $db->query($sql_shUsrCurso);
+        $stmt_shUsrCurso->execute();
+        $shUsrCurso = $stmt_shUsrCurso->fetchAll();
+        $_SESSION["usrCurso"] = $shUsrCurso;
+
         return view('main');
     }
 
@@ -191,7 +214,7 @@ class MainController extends Controller {
                 $selectedListsDel = filter_input(INPUT_POST, "listsDel");
                 var_dump($selectedListsDel);
                 $db = Registry::get('database');
-                $sql_selList = "DELETE * from listas WHERE id_name = '".$selectedListsDel."';"; //listas creadas por usr
+                $sql_selList = "DELETE from listas WHERE id = '".$selectedListsDel."';"; //listas creadas por usr
                 $stmt_selList = $db->query($sql_selList);
                 $stmt_selList->execute();
                 $list = $stmt_selList->fetchAll();
@@ -201,9 +224,81 @@ class MainController extends Controller {
             }
         } 
         
+        public function actTask(){
+            try {
+                $nametask = filter_input(INPUT_POST, "tasksDel");
+                $selectedListsDel = filter_input(INPUT_POST, "listsDel");
+
+                $db = Registry::get('database');
+                $idusr = $_SESSION["usrid"];
+                $sql_actList = "SELECT id from listas WHERE list_name = '".$selectedListsDel.";";
+                var_dump($selectedListsDel);
+                $stmt_actList= $db->query($sql_actList);
+                $stmt_actList->execute();
+                $listAct = $stmt_actList->fetchAll();
+                $sql_actTask = "SELECT tarea_name from tareas WHERE id_list = '".intval($listAct)."' and id_user = '".intval($idusr)."';";
+                $stmt_actTask= $db->query($sql_actTask);
+                $stmt_actTask->execute();
+                $taskAct = $stmt_actTask->fetchAll();
+
+            } catch (\PDOException $e) {
+                die($e->getMessage());
+            }
+        } 
+
         public function delTask(){
             try {
-                
+                $nametask = filter_input(INPUT_POST, "tasksDel");
+                $selectedListsDel = filter_input(INPUT_POST, "listsDel");
+                $deleteBtn = filter_input(INPUT_POST, "btnDelTask");
+                $actBtn = filter_input(INPUT_POST, "refresh");
+                $db = Registry::get('database');
+                $selectedListsDel = str_replace('_', ' ', $selectedListsDel);
+                $idusr = $_SESSION["usrid"];
+
+                $sql_actList = "SELECT id from listas WHERE list_name = '".$selectedListsDel."';";
+                $stmt_actList= $db->query($sql_actList);
+                $stmt_actList->execute();
+                $listAct = $stmt_actList->fetchAll();
+
+                //var_dump($selectedListsDel);
+                if($deleteBtn){
+                    //var_dump($selectedListsDel);
+                    $sql_selList = "DELETE from tareas WHERE tarea_name = '".$nametask."' AND id_list = '".$listAct[0]["id"]."';"; //listas creadas por usr
+                    $stmt_selList = $db->query($sql_selList);
+                    $stmt_selList->execute();
+
+                    $sql_actList = "SELECT id from listas WHERE list_name = '".$selectedListsDel."';";
+                    $stmt_actList= $db->query($sql_actList);
+                    $stmt_actList->execute();
+                    $listAct = $stmt_actList->fetchAll();
+                    $sql_actTask = "SELECT tarea_name from tareas WHERE id_list = '".intval($listAct[0]["id"])."' and id_user = '".intval($idusr)."';";
+                    $stmt_actTask= $db->query($sql_actTask);
+                    $stmt_actTask->execute();
+                    $taskAct = $stmt_actTask->fetchAll();
+                    $_SESSION["taskDel"] = $taskAct;
+                }
+
+                if($actBtn){
+
+
+                    $sql_actList = "SELECT id from listas WHERE list_name = '".$selectedListsDel."';";
+                    //var_dump($listAct[0]["id"]);
+                    $stmt_actList= $db->query($sql_actList);
+                    //var_dump($stmt_actList);
+                    $stmt_actList->execute();
+                    $listAct = $stmt_actList->fetchAll();
+                    //var_dump($listAct);
+                    $sql_actTask = "SELECT tarea_name from tareas WHERE id_list = '".intval($listAct[0]["id"])."' and id_user = '".intval($idusr)."';";
+                    $stmt_actTask= $db->query($sql_actTask);
+                    $stmt_actTask->execute();
+                    $taskAct = $stmt_actTask->fetchAll();
+                    $_SESSION["taskDel"] = $taskAct;
+
+                    //var_dump($taskAct[2]);
+                }
+
+                $this->redirectTo('/main');
             } catch (\PDOException $e) {
                 die($e->getMessage());
             }

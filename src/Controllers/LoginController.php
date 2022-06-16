@@ -22,6 +22,7 @@ class LoginController extends Controller {
 
     public function form(){
         try {
+            session_start();
             $username = filter_input(INPUT_POST, "username");
             $password = filter_input(INPUT_POST, "password");
             // $db = getConnection($dsn,$dbuser,$dbpasswd);
@@ -36,19 +37,20 @@ class LoginController extends Controller {
             $results = $stmt->fetchAll();
             $verify = password_verify($password,$results[0]["passwd"]);
             $_SESSION["userRol"] = $results[0]["rol"];
-            var_dump($results[0]["rol"]);
-            var_dump($password);
-            var_dump($verify);
+            // var_dump($results[0]["rol"]);
+            // var_dump($password);
+            // var_dump($verify);
+            
             //$remember = filter_input(INPUT_POST, "remember");
             $login = filter_input(INPUT_POST, "login");
-            
+            $_SESSION["usrid"] = $results[0]["id"];
             if(empty($results) == false && $verify){
         
                 //Te has logueado correctamente
                 session_start();
                 $_SESSION["username"] = $username; 
                 //$_SESSION["date"] = "";
-                var_dump("login");
+                // var_dump("login");
                 $this->redirectTo('/main');
             } else {
                 //No te has podido loguear
